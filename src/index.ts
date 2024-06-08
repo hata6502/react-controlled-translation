@@ -1,8 +1,10 @@
 import { useEffect, useState, useSyncExternalStore } from "react";
 
+/** @returns The language requested by the browser's built-in translation UI */
 export const useLanguage = () =>
   useSyncExternalStore(subscribeLanguage, getLanguageSnapshot);
 
+/** @returns Text translated by the browser's built-in translation feature */
 export const useTranslation = (text: string) => {
   const [translatedText, setTranslatedText] = useState(text);
 
