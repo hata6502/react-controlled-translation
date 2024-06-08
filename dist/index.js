@@ -5,7 +5,11 @@ export const useLanguage = () => useSyncExternalStore(subscribeLanguage, getLang
 export const useTranslation = (text) => {
     const [translatedText, setTranslatedText] = useState(text);
     useEffect(() => {
-        const hiddenElement = document.createElement("span");
+        // Don't use <span>. Because Google Translate remove it with <font>.
+        // https://gyazo.com/4f62aaae58146265e4b9d114cf526dcc
+        // By using <div>, it's not removed. And <font> is created in it.
+        // https://gyazo.com/8996c9ecbed91c8d39743eb88708e335
+        const hiddenElement = document.createElement("div");
         hiddenElement.innerText = text;
         containerElement.append(hiddenElement);
         const handleTranslation = () => {
