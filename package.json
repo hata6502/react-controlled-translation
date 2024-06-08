@@ -1,6 +1,6 @@
 {
   "name": "react-controlled-translation",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Use the browser's built-in translation feature in React for free and safely. ",
   "keywords": [
     "translation",
@@ -18,6 +18,6 @@
     "typescript": "^5.4.5"
   },
   "peerDependencies": {
-    "react": "^18.3.1"
+    "react": "^18"
   }
 }
