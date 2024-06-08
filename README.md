@@ -12,4 +12,4 @@ npm i react-controlled-translation
 
 ## API
 
-See [the type definition](https://github.com/hata6502/react-controlled-translation/blob/main/dist/index.d.ts).
+See the [type definition](https://github.com/hata6502/react-controlled-translation/blob/main/dist/index.d.ts).
