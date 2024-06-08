@@ -1,0 +1,19 @@
+{
+  "name": "react-controlled-translation",
+  "version": "1.0.0",
+  "description": "Use the browser's built-in translation feature in React for free and safely. ",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "test": "tsc --noEmit"
+  },
+  "author": "hata6502",
+  "license": "CC0-1.0",
+  "devDependencies": {
+    "@types/react": "^18.3.3",
+    "typescript": "^5.4.5"
+  },
+  "peerDependencies": {
+    "react": "^18.3.1"
+  }
+}
