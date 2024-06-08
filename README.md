@@ -1,6 +1,6 @@
 # react-controlled-translation
 
-Use the browser's built-in translation feature in React for free and safely.
+Use the browser's built-in translation feature even in React safely.
 
 Try the [demo](https://jvvmnt-5173.csb.app/) ✨
 
