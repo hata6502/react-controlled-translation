@@ -48,8 +48,6 @@ const getLanguageSnapshot = () => document.documentElement.lang;
 const containerElement = document.createElement("div");
 containerElement.classList.add("react-controlled-translation");
 // Don't use `display: none`. Because Safari doesn't translate hidden elements.
-containerElement.style.position = "absolute";
-containerElement.style.width = "0";
-containerElement.style.height = "0";
-containerElement.style.overflow = "hidden";
+// Don't use `overflow: hidden`. Because innerText is empty in Safari.
+containerElement.style.fontSize = "0";
 document.body.append(containerElement);
