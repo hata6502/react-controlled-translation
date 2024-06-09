@@ -56,5 +56,9 @@ const getLanguageSnapshot = () => document.documentElement.lang;
 
 const containerElement = document.createElement("div");
 containerElement.classList.add("react-controlled-translation");
-containerElement.style.display = "none";
+// Don't use `display: none`. Because Safari doesn't translate hidden elements.
+containerElement.style.position = "absolute";
+containerElement.style.width = "0";
+containerElement.style.height = "0";
+containerElement.style.overflow = "hidden";
 document.body.append(containerElement);
