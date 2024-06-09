@@ -1,6 +1,6 @@
 {
   "name": "react-controlled-translation",
-  "version": "1.0.10",
+  "version": "1.0.11",
   "description": "Use the browser's built-in translation feature even in React safely. ",
   "keywords": [
     "translation",

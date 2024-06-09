@@ -10,12 +10,12 @@ export const useTranslation = (text) => {
         // By using <div>, it's not removed. And <font> is created in it.
         // https://gyazo.com/8996c9ecbed91c8d39743eb88708e335
         const hiddenElement = document.createElement("div");
-        hiddenElement.innerText = text;
+        hiddenElement.textContent = text;
         containerElement.append(hiddenElement);
         const handleTranslation = () => {
             translationObserver.disconnect();
             try {
-                setTranslatedText(hiddenElement.innerText);
+                setTranslatedText(hiddenElement.textContent ?? "");
             }
             finally {
                 translationObserver.observe(hiddenElement, {
