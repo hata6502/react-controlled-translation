@@ -25,4 +25,4 @@ See the [type definition](https://github.com/hata6502/react-controlled-translati
 - Firefox
   - [x] macOS
 - Edge
-  - [ ] macOS
+  - [x] macOS
