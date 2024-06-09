@@ -57,7 +57,7 @@ document.body.append(containerElement);
 
 const helloElement = document.createElement("div");
 helloElement.lang = "en";
-helloElement.textContent = "Hello";
+helloElement.textContent = multilingualHellos.en;
 containerElement.append(helloElement);
 
 const languageEventTarget = new EventTarget();
