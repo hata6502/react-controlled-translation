@@ -1,7 +1,7 @@
 import leven from "leven";
 import { useEffect, useState, useSyncExternalStore } from "react";
 
-import { multilingualHellos } from "./multilingual-hellos";
+import { languages, multilingualHellos } from "./multilingual-hellos";
 
 /** @returns The language requested by the browser's built-in translation UI */
 export const useLanguage = () =>
@@ -55,16 +55,19 @@ containerElement.style.position = "fixed";
 containerElement.style.left = "-1e+09px";
 document.body.append(containerElement);
 
-const helloElement = document.createElement("div");
-helloElement.lang = "en";
-helloElement.textContent = multilingualHellos.en;
-containerElement.append(helloElement);
+const helloElements = multilingualHellos.map((hellos) => {
+  const helloElement = document.createElement("div");
+  helloElement.lang = "en";
+  helloElement.textContent = hellos.en;
+  containerElement.append(helloElement);
+  return helloElement;
+});
 
 const languageEventTarget = new EventTarget();
 const languageObserver = new MutationObserver(() => {
   languageEventTarget.dispatchEvent(new CustomEvent("mutation"));
 });
-languageObserver.observe(helloElement, {
+languageObserver.observe(containerElement, {
   subtree: true,
   childList: true,
   characterData: true,
@@ -78,9 +81,22 @@ const subscribeLanguage = (callback: () => void) => {
 };
 
 const getLanguageSnapshot = () => {
-  const translatedText = helloElement.textContent ?? "";
-  const distances = Object.entries(multilingualHellos)
-    .map(([lang, hello]) => [lang, leven(translatedText, hello)] as const)
+  const distances = languages
+    .map(
+      (language) =>
+        [
+          language,
+          multilingualHellos.reduce(
+            (distance, hellos, helloIndex) =>
+              distance +
+              leven(
+                helloElements[helloIndex].textContent ?? "",
+                hellos[language]
+              ),
+            0
+          ),
+        ] as const
+    )
     .toSorted(([, aDistance], [, bDistance]) => aDistance - bDistance);
   const [nearestLanguage] = distances[0];
   return nearestLanguage;
