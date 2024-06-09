@@ -58,5 +58,8 @@ const containerElement = document.createElement("div");
 containerElement.classList.add("react-controlled-translation");
 // Don't use `display: none`. Because Safari doesn't translate hidden elements.
 // Don't use `overflow: hidden`. Because innerText is empty in Safari.
-containerElement.style.fontSize = "0";
+// Don't use `font-size: 0`. Because Edge marks it as `_msthidden="1"`.
+containerElement.style.visibility = "hidden";
+containerElement.style.position = "fixed";
+containerElement.style.left = "-1e+09px";
 document.body.append(containerElement);
