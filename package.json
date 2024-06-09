@@ -1,6 +1,6 @@
 {
   "name": "react-controlled-translation",
-  "version": "1.0.11",
+  "version": "1.0.12",
   "description": "Use the browser's built-in translation feature even in React safely. ",
   "keywords": [
     "translation",
@@ -14,6 +14,9 @@
   },
   "author": "hata6502",
   "license": "CC0-1.0",
+  "dependencies": {
+    "leven": "^4.0.0"
+  },
   "devDependencies": {
     "@types/react": "^18.3.3",
     "typescript": "^5.4.5"

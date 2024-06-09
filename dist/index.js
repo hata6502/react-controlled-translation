@@ -1,8 +1,10 @@
+import leven from "leven";
 import { useEffect, useState, useSyncExternalStore } from "react";
+import { multilingualHellos } from "./multilingual-hellos";
 /** @returns The language requested by the browser's built-in translation UI */
 export const useLanguage = () => useSyncExternalStore(subscribeLanguage, getLanguageSnapshot);
 /** @returns Text translated by the browser's built-in translation feature */
-export const useTranslation = (text) => {
+export const useTranslation = (text, lang) => {
     const [translatedText, setTranslatedText] = useState(text);
     useEffect(() => {
         // Don't use <span>. Because Google Translate remove it with <font>.
@@ -10,6 +12,7 @@ export const useTranslation = (text) => {
         // By using <div>, it's not removed. And <font> is created in it.
         // https://gyazo.com/8996c9ecbed91c8d39743eb88708e335
         const hiddenElement = document.createElement("div");
+        hiddenElement.lang = lang ?? "";
         hiddenElement.textContent = text;
         containerElement.append(hiddenElement);
         const handleTranslation = () => {
@@ -34,17 +37,6 @@ export const useTranslation = (text) => {
     }, [text]);
     return translatedText;
 };
-const subscribeLanguage = (callback) => {
-    const languageObserver = new MutationObserver(callback);
-    languageObserver.observe(document.documentElement, {
-        attributes: true,
-        attributeFilter: ["lang"],
-    });
-    return () => {
-        languageObserver.disconnect();
-    };
-};
-const getLanguageSnapshot = () => document.documentElement.lang;
 const containerElement = document.createElement("div");
 containerElement.classList.add("react-controlled-translation");
 // Don't use `display: none`. Because Safari doesn't translate hidden elements.
@@ -54,3 +46,30 @@ containerElement.style.visibility = "hidden";
 containerElement.style.position = "fixed";
 containerElement.style.left = "-1e+09px";
 document.body.append(containerElement);
+const helloElement = document.createElement("div");
+helloElement.lang = "en";
+helloElement.textContent = "Hello";
+containerElement.append(helloElement);
+const languageEventTarget = new EventTarget();
+const languageObserver = new MutationObserver(() => {
+    languageEventTarget.dispatchEvent(new CustomEvent("mutation"));
+});
+languageObserver.observe(helloElement, {
+    subtree: true,
+    childList: true,
+    characterData: true,
+});
+const subscribeLanguage = (callback) => {
+    languageEventTarget.addEventListener("mutation", callback);
+    return () => {
+        languageEventTarget.removeEventListener("mutation", callback);
+    };
+};
+const getLanguageSnapshot = () => {
+    const translatedText = helloElement.textContent ?? "";
+    const distances = Object.entries(multilingualHellos)
+        .map(([lang, hello]) => [lang, leven(translatedText, hello)])
+        .toSorted(([, aDistance], [, bDistance]) => aDistance - bDistance);
+    const [nearestLanguage] = distances[0];
+    return nearestLanguage;
+};
