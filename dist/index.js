@@ -14,14 +14,18 @@ export const useTranslation = (text, lang) => {
         const hiddenElement = document.createElement("div");
         hiddenElement.lang = lang ?? "";
         hiddenElement.textContent = text;
-        containerElement.append(hiddenElement);
+        escapeMutate(() => {
+            containerElement.append(hiddenElement);
+        });
         const handleMutate = () => {
             setTranslatedText(hiddenElement.textContent ?? "");
         };
         eventTarget.addEventListener("mutate", handleMutate);
         return () => {
             eventTarget.removeEventListener("mutate", handleMutate);
-            hiddenElement.remove();
+            escapeMutate(() => {
+                hiddenElement.remove();
+            });
         };
     }, [text]);
     return translatedText;
@@ -53,11 +57,20 @@ languageObserver.observe(document.documentElement, {
 const containerObserver = new MutationObserver(() => {
     eventTarget.dispatchEvent(new CustomEvent("mutate"));
 });
-containerObserver.observe(containerElement, {
-    subtree: true,
-    childList: true,
-    characterData: true,
-});
+const escapeMutate = (mutate) => {
+    containerObserver.disconnect();
+    try {
+        mutate();
+    }
+    finally {
+        containerObserver.observe(containerElement, {
+            subtree: true,
+            childList: true,
+            characterData: true,
+        });
+    }
+};
+escapeMutate(() => { });
 let languageChanged = false;
 let mutated = false;
 const subscribeLanguage = (callback) => {
