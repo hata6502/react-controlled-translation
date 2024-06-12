@@ -21,23 +21,13 @@ export const useTranslation = (text: string, lang?: string) => {
     hiddenElement.textContent = text;
     containerElement.append(hiddenElement);
 
-    const handleTranslation = () => {
-      translationObserver.disconnect();
-      try {
-        setTranslatedText(hiddenElement.textContent ?? "");
-      } finally {
-        translationObserver.observe(hiddenElement, {
-          subtree: true,
-          childList: true,
-          characterData: true,
-        });
-      }
+    const handleMutate = () => {
+      setTranslatedText(hiddenElement.textContent ?? "");
     };
-    const translationObserver = new MutationObserver(handleTranslation);
-    handleTranslation();
+    eventTarget.addEventListener("mutate", handleMutate);
 
     return () => {
-      translationObserver.disconnect();
+      eventTarget.removeEventListener("mutate", handleMutate);
       hiddenElement.remove();
     };
   }, [text]);
@@ -63,41 +53,72 @@ const helloElements = multilingualHellos.map((hellos) => {
   return helloElement;
 });
 
-const languageEventTarget = new EventTarget();
+const eventTarget = new EventTarget();
+
 const languageObserver = new MutationObserver(() => {
-  languageEventTarget.dispatchEvent(new CustomEvent("mutation"));
+  eventTarget.dispatchEvent(new CustomEvent("languagechange"));
 });
-languageObserver.observe(containerElement, {
+languageObserver.observe(document.documentElement, {
+  attributes: true,
+  attributeFilter: ["lang"],
+});
+
+const containerObserver = new MutationObserver(() => {
+  eventTarget.dispatchEvent(new CustomEvent("mutate"));
+});
+containerObserver.observe(containerElement, {
   subtree: true,
   childList: true,
   characterData: true,
 });
 
+let languageChanged = false;
+let mutated = false;
 const subscribeLanguage = (callback: () => void) => {
-  languageEventTarget.addEventListener("mutation", callback);
+  const handleLanguageChange = () => {
+    languageChanged = true;
+    callback();
+  };
+  eventTarget.addEventListener("languagechange", handleLanguageChange);
+
+  const handleMutate = () => {
+    mutated = true;
+    callback();
+  };
+  eventTarget.addEventListener("mutate", handleMutate);
+
   return () => {
-    languageEventTarget.removeEventListener("mutation", callback);
+    eventTarget.removeEventListener("languagechange", handleLanguageChange);
+    eventTarget.removeEventListener("mutate", handleMutate);
   };
 };
 
 const getLanguageSnapshot = () => {
-  const distances = languages
-    .map(
-      (language) =>
-        [
-          language,
-          multilingualHellos.reduce(
-            (distance, hellos, helloIndex) =>
-              distance +
-              leven(
-                helloElements[helloIndex].textContent ?? "",
-                hellos[language]
-              ),
-            0
-          ),
-        ] as const
-    )
-    .toSorted(([, aDistance], [, bDistance]) => aDistance - bDistance);
-  const [nearestLanguage] = distances[0];
-  return nearestLanguage;
+  if (languageChanged) {
+    return document.documentElement.lang;
+  }
+
+  if (mutated) {
+    const distances = languages
+      .map(
+        (language) =>
+          [
+            language,
+            multilingualHellos.reduce(
+              (distance, hellos, helloIndex) =>
+                distance +
+                leven(
+                  helloElements[helloIndex].textContent ?? "",
+                  hellos[language]
+                ),
+              0
+            ),
+          ] as const
+      )
+      .toSorted(([, aDistance], [, bDistance]) => aDistance - bDistance);
+    const [nearestLanguage] = distances[0];
+    return nearestLanguage;
+  }
+
+  return document.documentElement.lang;
 };

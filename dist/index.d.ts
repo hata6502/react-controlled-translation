@@ -1,4 +1,4 @@
 /** @returns The language requested by the browser's built-in translation UI */
-export declare const useLanguage: () => "af" | "am" | "ar" | "az" | "be" | "bg" | "bn" | "bs" | "ca" | "co" | "cs" | "cy" | "da" | "de" | "el" | "en" | "eo" | "es" | "et" | "eu" | "fa" | "fi" | "fr" | "fy" | "ga" | "gd" | "gl" | "gu" | "ha" | "he" | "hi" | "hr" | "ht" | "hu" | "hy" | "id" | "ig" | "is" | "it" | "ja" | "jv" | "ka" | "kk" | "km" | "kn" | "ko" | "ku" | "ky" | "la" | "lb" | "lo" | "lt" | "lv" | "mg" | "mi" | "mk" | "ml" | "mn" | "mr" | "ms" | "mt" | "my" | "nb" | "ne" | "nl" | "no" | "ny" | "or" | "pa" | "pl" | "ps" | "pt" | "ro" | "ru" | "rw" | "sd" | "si" | "sk" | "sl" | "sm" | "sn" | "so" | "sq" | "sr" | "st" | "su" | "sv" | "sw" | "ta" | "te" | "tg" | "th" | "tk" | "tl" | "tr" | "tt" | "ug" | "uk" | "ur" | "uz" | "vi" | "xh" | "yi" | "yo" | "zh" | "zu";
+export declare const useLanguage: () => string;
 /** @returns Text translated by the browser's built-in translation feature */
 export declare const useTranslation: (text: string, lang?: string) => string;
