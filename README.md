@@ -1,6 +1,6 @@
 # react-controlled-translation
 
-Use the browser's built-in translation feature even in React safely.
+Controll the browser's built-in translation feature even in React safely.
 
 Try the [demo](https://jvvmnt-5173.csb.app/) ✨
 
@@ -25,4 +25,4 @@ See the [type definition](https://github.com/hata6502/react-controlled-translati
 - Firefox
   - [x] macOS
 - Edge
-  - [ ] macOS
+  - [x] macOS
