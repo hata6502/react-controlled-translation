@@ -1,45 +1,34 @@
 import leven from "leven";
-import { useEffect, useState, useSyncExternalStore } from "react";
+import { useEffect, useId, useState, useSyncExternalStore } from "react";
 import { languages, multilingualHellos } from "./multilingual-hellos";
 /** @returns The language requested by the browser's built-in translation UI */
 export const useLanguage = () => useSyncExternalStore(subscribeLanguage, getLanguageSnapshot);
 /** @returns Text translated by the browser's built-in translation feature */
-export const useTranslation = (texts, lang) => {
-    const [translatedTexts, setTranslatedTexts] = useState(texts);
+export const useTranslation = (text, lang) => {
+    const id = useId();
+    const [translatedText, setTranslatedText] = useState(text);
     useEffect(() => {
-        setTranslatedTexts(texts);
-        const hiddenElement = document.createElement("div");
+        const hiddenElement = document.createElement("span");
+        hiddenElement.id = id;
         hiddenElement.lang = lang ?? "";
-        for (const [textIndex, text] of texts.entries()) {
-            hiddenElement.append(text);
-            if (textIndex < texts.length - 1) {
-                hiddenElement.append(new Comment());
-            }
-        }
+        hiddenElement.textContent = text;
         escapeMutate(() => {
             containerElement.append(hiddenElement);
         });
         const handleMutate = () => {
-            const texts = [...hiddenElement.childNodes].reduce((texts, node) => {
-                if (node instanceof Comment) {
-                    return [...texts, ""];
-                }
-                return [
-                    ...texts.slice(0, -1),
-                    `${texts[texts.length - 1]}${node.textContent}`,
-                ];
-            }, [""]);
-            setTranslatedTexts(texts);
+            const hiddenElement = document.getElementById(id);
+            setTranslatedText(hiddenElement?.textContent ?? "");
         };
         eventTarget.addEventListener("mutate", handleMutate);
         return () => {
             eventTarget.removeEventListener("mutate", handleMutate);
             escapeMutate(() => {
-                hiddenElement.remove();
+                const hiddenElement = document.getElementById(id);
+                hiddenElement?.remove();
             });
         };
-    }, [texts]);
-    return translatedTexts;
+    }, [text]);
+    return translatedText;
 };
 const containerElement = document.createElement("div");
 containerElement.classList.add("react-controlled-translation");
