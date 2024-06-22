@@ -8,23 +8,41 @@ export const useLanguage = () =>
   useSyncExternalStore(subscribeLanguage, getLanguageSnapshot);
 
 /** @returns Text translated by the browser's built-in translation feature */
-export const useTranslation = (text: string, lang?: string) => {
-  const [translatedText, setTranslatedText] = useState(text);
+export const useTranslation = (texts: string[], lang?: string) => {
+  const [translatedTexts, setTranslatedTexts] = useState(texts);
 
   useEffect(() => {
-    // Don't use <span>. Because Google Translate remove it with <font>.
-    // https://gyazo.com/4f62aaae58146265e4b9d114cf526dcc
-    // By using <div>, it's not removed. And <font> is created in it.
-    // https://gyazo.com/8996c9ecbed91c8d39743eb88708e335
+    setTranslatedTexts(texts);
+
     const hiddenElement = document.createElement("div");
     hiddenElement.lang = lang ?? "";
-    hiddenElement.textContent = text;
+
+    for (const [textIndex, text] of texts.entries()) {
+      hiddenElement.append(text);
+      if (textIndex < texts.length - 1) {
+        hiddenElement.append(new Comment());
+      }
+    }
+
     escapeMutate(() => {
       containerElement.append(hiddenElement);
     });
 
     const handleMutate = () => {
-      setTranslatedText(hiddenElement.textContent ?? "");
+      const texts = [...hiddenElement.childNodes].reduce(
+        (texts, node) => {
+          if (node instanceof Comment) {
+            return [...texts, ""];
+          }
+
+          return [
+            ...texts.slice(0, -1),
+            `${texts[texts.length - 1]}${node.textContent}`,
+          ];
+        },
+        [""]
+      );
+      setTranslatedTexts(texts);
     };
     eventTarget.addEventListener("mutate", handleMutate);
 
@@ -34,9 +52,9 @@ export const useTranslation = (text: string, lang?: string) => {
         hiddenElement.remove();
       });
     };
-  }, [text]);
+  }, [texts]);
 
-  return translatedText;
+  return translatedTexts;
 };
 
 const containerElement = document.createElement("div");
@@ -46,7 +64,7 @@ containerElement.classList.add("react-controlled-translation");
 // Don't use `font-size: 0`. Because Edge marks it as `_msthidden="1"`.
 containerElement.style.visibility = "hidden";
 containerElement.style.position = "fixed";
-containerElement.style.left = "-1e+09px";
+containerElement.style.top = "100%";
 document.body.append(containerElement);
 
 const helloElements = multilingualHellos.map((hellos) => {
